@@ -26,6 +26,8 @@ public class User{
   
   private String userName;
   
+  private String email;
+  
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id")
   @JsonIgnore
@@ -98,6 +100,14 @@ public class User{
 
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 		  
 }

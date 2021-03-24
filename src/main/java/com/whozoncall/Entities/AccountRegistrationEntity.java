@@ -1,27 +1,32 @@
 package com.whozoncall.Entities;
 
+import org.springframework.lang.Nullable;
+
 public class AccountRegistrationEntity {
 
-	private String userName;
+	private String username;
 	
-	private String accountName;
+	@Nullable
+	private String company;
 	
 	private String password;
+	
+	private String email;
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getAccountName() {
-		return accountName;
+	public String getCompany() {
+		return company;
 	}
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
+	public void setCompany(String company) {
+		this.company = company;
 	}
 
 	public String getPassword() {
@@ -30,6 +35,14 @@ public class AccountRegistrationEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 	

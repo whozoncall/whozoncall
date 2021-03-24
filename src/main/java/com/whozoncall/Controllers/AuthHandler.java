@@ -1,15 +1,18 @@
 package com.whozoncall.Controllers;
 
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.whozoncall.Constants.SecurityConstants;
 import com.whozoncall.Dao.AccountRepository;
@@ -40,78 +43,81 @@ public class AuthHandler {
 	@Autowired
 	UserRepository userRepo;
 
-	@PostMapping(path="/Register")
-	public ResponseEntity<?> Register(@RequestBody AccountRegistrationEntity account){
-		
-		try {
-
-			Account localAccount = new Account();
-			localAccount.setAccountName(account.getAccountName());
-			
-			User user = new User();
-			user.setUserName(account.getUserName());
-			user.setPassword(Base64.getEncoder().encodeToString(hash(account.getPassword(),SecurityConstants.SALT.value.getBytes())));
-			
-			accountRepo.save(localAccount);
-			user.setAccount(localAccount);
-			userRepo.save(user);
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage()+" -- Unable to Register");			
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	
-	
-	
-		return  new ResponseEntity<>(null, HttpStatus.ACCEPTED);
-		
-		}
-
-	@PostMapping(path="/Login")
-	@ResponseBody
-	public ResponseEntity<?> Login(@RequestBody AccountRegistrationEntity account, HttpSession session){
+	@RequestMapping(value = "/Login", method = RequestMethod.POST)
+	public ResponseEntity<Object> Login(@RequestBody AccountRegistrationEntity account, HttpSession session){
 		
 		try {
 			
-				Account acc = accountRepo.findByAccountName(account.getAccountName());
+				Account acc = accountRepo.findByAccountName(account.getCompany());
 				
 				if(acc==null)
 				{
-					log.error("No such account name as "+account.getAccountName());			
-					return  new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+					log.error("No such account name as "+account.getCompany());			
+					return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 				}
 				
-				User user = userRepo.findAccountByUserNameandPassword(acc.getId(), 
-									account.getUserName(), Base64.getEncoder().encodeToString(hash(account.getPassword(),SecurityConstants.SALT.value.getBytes())));
+				User user = userRepo.findAccountByUserNameOrEmailandPassword(acc.getId(), 
+									account.getUsername(), Base64.getEncoder().encodeToString(hash(account.getPassword(),SecurityConstants.SALT.value.getBytes())));
 				
 				if(user != null)
-				{
+				{	
 					// set session attribute for future use 
 					session.setAttribute("userId", user.getId());
+					return  ResponseEntity.ok().build();
 				}
 				else
 				{
 					if(session != null)
 						session.invalidate();
 					
-					return  new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+					log.error("No such user name or email as  "+account.getUsername());
+					return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 				}
 			
 			}
 		catch (Exception e)
 			{
 				log.error(e.getMessage()+" -- Unable to process login");			
-				return  new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+				return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 			}
-		
-		
-		
-		return  new ResponseEntity<>(null, HttpStatus.OK);
 			
 		
 	}
 	
+
+	
+	@PostMapping(path="/Register", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> Register(@RequestBody AccountRegistrationEntity account,
+			HttpSession session){
+		
+		try {
+
+			Account localAccount = new Account();
+			localAccount.setAccountName(account.getCompany());
+			
+			User user = new User();
+			user.setUserName(account.getUsername());
+			user.setPassword(Base64.getEncoder().encodeToString(hash(account.getPassword(),SecurityConstants.SALT.value.getBytes())));
+			user.setEmail(account.getEmail());
+			
+			accountRepo.save(localAccount);
+			user.setAccount(localAccount);
+			userRepo.save(user);
+			
+			session.setAttribute("userId", user.getId());
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage()+" -- Unable to Register");			
+			return ResponseEntity.badRequest().build();
+		}
+	
+	
+	
+		return  ResponseEntity.ok().build();
+		
+		}
+
 	
 	
 	private static byte[] hash(String password, byte[] salt)   

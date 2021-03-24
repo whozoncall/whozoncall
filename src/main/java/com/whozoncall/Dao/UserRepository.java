@@ -19,7 +19,7 @@ public interface UserRepository extends CrudRepository<PDAccount, Long> {
 	List<User> getPdSlackUserMap();
 	
 	
-	@Query("from User u WHERE u.account.id = ?1 and u.userName =?2 and u.password= ?3 ")
-	User findAccountByUserNameandPassword(Long accountId, String userName, String passowrd);
+	@Query("from User u WHERE u.account.id = ?1 and ( u.userName =?2 OR u.email=?2) and u.password= ?3 ")
+	User findAccountByUserNameOrEmailandPassword(Long accountId, String userName, String passowrd);
 
 }

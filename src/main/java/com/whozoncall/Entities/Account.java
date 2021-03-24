@@ -36,10 +36,10 @@ public class Account{
   private Long modifiedOn;
   
   
-  private Boolean onTrial = false;
+  private Boolean onTrial = true;
   
   
-  private Boolean onPaidSub = true;
+  private Boolean onPaidSub = false;
   
   @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy="account")
   private List<Integration> integrations;
