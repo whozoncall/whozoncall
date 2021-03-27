@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
+import org.springframework.stereotype.Service;
 
 import com.whozoncall.Constants.APIEndPoints;
 import com.whozoncall.Dao.AccountRepository;
@@ -52,8 +54,8 @@ import io.netty.handler.codec.http.HttpHeaders;
  * 
  */
 
-@Component
-public class SlackInitTaskScheduler implements ApplicationRunner{
+@Service
+public class SlackInitTaskScheduler {
 	
 	
 	Logger logger = LoggerFactory.getLogger(SlackInitTaskScheduler.class);
@@ -128,7 +130,6 @@ public class SlackInitTaskScheduler implements ApplicationRunner{
 		
 		
 	}
-	
 	
 	private void startProcessForMinute(Integer timeInteger) throws IOException{
 		
@@ -209,8 +210,10 @@ public class SlackInitTaskScheduler implements ApplicationRunner{
 		
 	}
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
+	// Let's run this every minute
+	//@Scheduled(cron="* * * * *")
+	//@Async
+	public void runEveryMin() throws Exception {
 		
 		this.startProcessForMinute(Integer.parseInt(formatter.format(Instant.now()).toString()));
 			

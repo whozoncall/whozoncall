@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+
 import com.whozoncall.Dao.AccountRepository;
 import com.whozoncall.Dao.PDAccountRepository;
 import com.whozoncall.Dao.UserRepository;
@@ -75,27 +78,35 @@ public class PagerDutyAuthHandler {
 	 * 
 	 */
 	@GetMapping(path="/handleAuthCode")
-	public ResponseEntity<?> Register(@RequestParam String code, @RequestParam String subdomain){
+	public RedirectView HandleAuthCode(@RequestParam String code, @RequestParam String subdomain,
+			HttpResponse response, RedirectAttributes attributes){
 		
 			Account acc = accountRepo.findByAccountName(subdomain);
 			
 			if(acc!= null)
-			{
+			{	
 				
 				PDAccount pdAccount = new PDAccount();
 				pdAccount.setCode(code);
 				pdAccount.setSubdomain(subdomain);
 				pdAccount.setAccount(acc);
 				pdAccountRepo.save(pdAccount);
+				attributes.addFlashAttribute("error", false);
 				pdAuthFetchWorker.startJob();
+				
 				
 			}
 			else
 			{
-				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+				log.error(" Account not found, looks like you haven't yet registered or "
+						+ "the account name given was different during Sign up !! Got from PD now = > "+subdomain);
+				attributes.addFlashAttribute("error", true);
+				return  new RedirectView("/ui/add.html");
+				
 			}
 			
-		return new ResponseEntity<>(null, HttpStatus.OK);
+			
+		return new RedirectView("/ui/add.html");
 		
 		}
 

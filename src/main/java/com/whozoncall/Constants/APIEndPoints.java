@@ -30,7 +30,7 @@ public enum APIEndPoints {
 	
 	PD_CLIENT_ID("b27c0ccb003dd80c1ee16e60b2bd464bacd35042d45527db041294efd19a282d"),
 	
-	PD_AUTH_REDIRECT_URI("https://whozoncall.com"), //  "v1/PD/handleAuthCode" to be added 
+	PD_AUTH_REDIRECT_URI("https://whozoncall.com"), // /v1/PD/handleAuthCode 
 	
 	// this is incomplete, needs Code to be added at the end.
 	PD_API_AUTH_POST("https://app.pagerduty.com/oauth/token?grant_type=authorization_code&client_id="+APIEndPoints.PD_CLIENT_ID.value

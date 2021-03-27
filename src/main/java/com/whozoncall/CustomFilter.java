@@ -32,7 +32,8 @@ public class CustomFilter implements Filter {
 	    		
     	//CASE 1 allow calls to Login and register UI and backend calls
     	if(req.getServletPath().endsWith("/login.html") || req.getServletPath().endsWith("/Login") || req.getServletPath().endsWith("/Register")
-    			|| req.getServletPath().endsWith("/register.html"))
+    			|| req.getServletPath().endsWith("/register.html") || 
+    			req.getServletPath().endsWith("v1/PD/handleAuthCode"))
     		chain.doFilter(request, response);
     	
     	//CASE 2 UI call for Js and stuff then just allow

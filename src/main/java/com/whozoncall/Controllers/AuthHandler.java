@@ -63,6 +63,7 @@ public class AuthHandler {
 				{	
 					// set session attribute for future use 
 					session.setAttribute("userId", user.getId());
+					session.setAttribute("accountId", acc.getId());
 					return  ResponseEntity.ok().build();
 				}
 				else

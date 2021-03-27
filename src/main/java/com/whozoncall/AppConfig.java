@@ -8,9 +8,9 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 public @Configuration
 class AppConfig {
 
-  @Bean
-  public LettuceConnectionFactory redisConnectionFactory() {
-
-    return new LettuceConnectionFactory(new RedisStandaloneConfiguration("whozoncall-redis.y8ijy5.0001.use2.cache.amazonaws.com", 6379));
-  }
+//  @Bean
+//  public LettuceConnectionFactory redisConnectionFactory() {
+//
+//    return new LettuceConnectionFactory(new RedisStandaloneConfiguration("whozoncall-redis.y8ijy5.0001.use2.cache.amazonaws.com", 6379));
+//  }
 }

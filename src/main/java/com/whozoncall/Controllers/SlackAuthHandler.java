@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.view.RedirectView;
+
 import com.whozoncall.Dao.AccountRepository;
 import com.whozoncall.Dao.PDAccountRepository;
 import com.whozoncall.Dao.SlackAccountRepository;
@@ -83,7 +85,7 @@ public class SlackAuthHandler {
 	 * 
 	 */
 	@GetMapping(path="/handleAuthCode")
-	public ResponseEntity<?> Register(@RequestParam String code, @RequestParam String state){
+	public RedirectView Register(@RequestParam String code, @RequestParam String state){
 		
 			Account acc = accountRepo.findByGuid(state);
 			
@@ -102,10 +104,11 @@ public class SlackAuthHandler {
 			}
 			else
 			{
-				return new ResponseEntity<>(" Looks like you haven't yet created an Account with us !" , HttpStatus.NOT_FOUND);
+				log.error(" Looks like you haven't yet created an Account with us !");
+				return new RedirectView("/ui/add.html");
 			}
 			
-		return new ResponseEntity<>(" All is well! ", HttpStatus.OK);
+			return new RedirectView("/ui/add.html");
 		
 		}
 	
