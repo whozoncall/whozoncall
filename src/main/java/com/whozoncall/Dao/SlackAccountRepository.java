@@ -15,10 +15,12 @@ public interface SlackAccountRepository extends CrudRepository<SlackChannelAccou
 	@SuppressWarnings("unchecked")
 	SlackChannelAccount save(SlackChannelAccount slackChannelAccount);
 
-	@Query("from SlackChannelAccount ")
-	List<SlackChannelAccount> findAllSlackChannelAccounts();
+	@Query("from SlackChannelAccount c where c.account.id=?1")
+	List<SlackChannelAccount> findAllSlackChannelByAccountId(Long accountId);
 
 	
 	Optional<SlackChannelAccount> findById(Long id);
+
+	List<SlackChannelAccount> findAllSlackChannelAccounts();
 	
 }

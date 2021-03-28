@@ -1,6 +1,7 @@
 package com.whozoncall.Dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -17,5 +18,7 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
 	Account findByAccountName(String accountName);
 
 	Account findByGuid(String guid);
+	
+	Optional<Account> findById(Long Id);
 
 }

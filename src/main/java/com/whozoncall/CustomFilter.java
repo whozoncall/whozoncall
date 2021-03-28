@@ -31,9 +31,9 @@ public class CustomFilter implements Filter {
 	    		HttpServletResponse res =(HttpServletResponse)response;
 	    		
     	//CASE 1 allow calls to Login and register UI and backend calls
-    	if(req.getServletPath().endsWith("/login.html") || req.getServletPath().endsWith("/Login") || req.getServletPath().endsWith("/Register")
-    			|| req.getServletPath().endsWith("/register.html") || 
-    			req.getServletPath().endsWith("v1/PD/handleAuthCode"))
+    	if(req.getServletPath().endsWith("/login") || req.getServletPath().endsWith("/Login") || req.getServletPath().endsWith("/Register")
+    			|| req.getServletPath().endsWith("/register") || 
+    			req.getServletPath().endsWith("/handleAuthCode"))
     		chain.doFilter(request, response);
     	
     	//CASE 2 UI call for Js and stuff then just allow
@@ -42,7 +42,7 @@ public class CustomFilter implements Filter {
 	    		if(req.getServletPath().endsWith(".svg") || req.getServletPath().endsWith(".js") ||
 	    			req.getServletPath().endsWith(".png") || req.getServletPath().endsWith(".css")
 	    			|| req.getServletPath().endsWith(".map") || req.getServletPath().endsWith(".woff2")
-	    			|| req.getServletPath().endsWith("register.html") || req.getServletPath().endsWith("login.html"))
+	    			|| req.getServletPath().endsWith("register") || req.getServletPath().endsWith("login"))
 	    			
 	    			chain.doFilter(request, response);
 	    //CASE 2.1 UI call with session = ALLOW
@@ -50,7 +50,7 @@ public class CustomFilter implements Filter {
 	    				chain.doFilter(request, response);
 	    //CASE 2.2 UI call without session = DENY	     
 	    			else
-	    				res.sendRedirect("/ui/login.html");
+	    				res.sendRedirect("/ui/login");
     		}	
     	//CASE 3 any NON UI call with session 
     	else if( req.getSession(false)!=null)

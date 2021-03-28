@@ -15,6 +15,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.whozoncall.Constants.IntegrationTypes;
@@ -47,8 +49,8 @@ public class Integration{
   private String toTypeId;
   
   
-  // picked from slack User
-  private Boolean updateWithZone;
+  // picked from slack User tz
+  private Boolean updateWithZone = true ;
   
   /* actual message to be computed T-5 minutes before the Scheduled Post   
   *  (in case next on call is < 5 minutes away from now, do it now)
@@ -60,7 +62,7 @@ public class Integration{
   
   private Date modifiedOn;
   
-  private Boolean active;
+  private Boolean active = true;
 
 
 public String getToTypeId() {
@@ -110,6 +112,7 @@ public void setToType(IntegrationTypes toType) {
 		return createdOn;
 	}
 	
+	@PrePersist
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
@@ -118,6 +121,8 @@ public void setToType(IntegrationTypes toType) {
 		return modifiedOn;
 	}
 	
+	@PrePersist
+	@PreUpdate
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;
 	}

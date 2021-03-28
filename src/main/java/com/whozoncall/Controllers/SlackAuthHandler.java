@@ -105,10 +105,10 @@ public class SlackAuthHandler {
 			else
 			{
 				log.error(" Looks like you haven't yet created an Account with us !");
-				return new RedirectView("/ui/add.html");
+				return new RedirectView("/ui/add?success=false");
 			}
 			
-			return new RedirectView("/ui/add.html");
+			return new RedirectView("/ui/add?success=true");
 		
 		}
 	

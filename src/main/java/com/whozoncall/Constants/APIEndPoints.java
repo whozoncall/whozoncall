@@ -24,6 +24,8 @@ public enum APIEndPoints {
 	
 	PD_SCHEDULES_GET("https://api.pagerduty.com/schedules"),
 	
+	PD_ONCALLS_GET("https://api.pagerduty.com/oncalls"),
+	
 	PD_USERS_GET("https://api.pagerduty.com/users"),
 	
 	PD_CLIENT_SECRET("d1498cece3ddc50c250912a8d5cd2df369439b58a5075ced8b41ca161e53b14e"),
