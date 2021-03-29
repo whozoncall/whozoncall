@@ -64,6 +64,7 @@ public class AuthHandler {
 					// set session attribute for future use 
 					session.setAttribute("userId", user.getId());
 					session.setAttribute("accountId", acc.getId());
+					session.setAttribute("accountGuid", acc.getGuid());
 					return  ResponseEntity.ok().build();
 				}
 				else
@@ -106,6 +107,7 @@ public class AuthHandler {
 			userRepo.save(user);
 			
 			session.setAttribute("accountId", localAccount.getId());
+			session.setAttribute("accountGuid", localAccount.getGuid());
 			session.setAttribute("userId", user.getId());
 		}
 		catch (Exception e)
