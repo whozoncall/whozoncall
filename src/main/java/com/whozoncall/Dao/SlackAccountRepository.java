@@ -21,6 +21,8 @@ public interface SlackAccountRepository extends CrudRepository<SlackChannelAccou
 	
 	Optional<SlackChannelAccount> findById(Long id);
 
-	List<SlackChannelAccount> findAllSlackChannelAccounts();
+	@Query("from SlackChannelAccount c where c.slackAuthEntity.incoming_webhook.channel_id = ?1 ")
+	SlackChannelAccount findByChannelId(String channelId);
+
 	
 }

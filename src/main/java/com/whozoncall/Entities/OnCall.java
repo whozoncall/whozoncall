@@ -163,6 +163,30 @@ public class OnCall {
 	public void setOnCallScheduleNameAlias(String onCallScheduleNameAlias) {
 		this.onCallScheduleNameAlias = onCallScheduleNameAlias;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public List<Integration> getIntegration() {
+		return integration;
+	}
+
+	public void setIntegration(List<Integration> integration) {
+		this.integration = integration;
+	}
+
+	public PDAccount getPdaccount() {
+		return pdaccount;
+	}
+
+	public void setPdaccount(PDAccount pdaccount) {
+		this.pdaccount = pdaccount;
+	}
 	  
 	  
   

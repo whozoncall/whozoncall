@@ -28,6 +28,8 @@ public class SlackChannelMember {
 	private String tz_label;
 	
 	private String email;
+	
+	private String name;
 
 
 	public String getTz() {
@@ -68,6 +70,14 @@ public class SlackChannelMember {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	

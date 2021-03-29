@@ -17,7 +17,7 @@ $("#sigupbtn").click(function(event){
        contentType: 'application/json',
        success: function (data) {
            console.log(' success ');
-           window.location.href = "/ui/index.html";
+           window.location.href = "/ui/integrations";
        },
        error: function(data) {
            

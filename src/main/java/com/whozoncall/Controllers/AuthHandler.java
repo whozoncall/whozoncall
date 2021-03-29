@@ -105,6 +105,7 @@ public class AuthHandler {
 			user.setAccount(localAccount);
 			userRepo.save(user);
 			
+			session.setAttribute("accountId", localAccount.getId());
 			session.setAttribute("userId", user.getId());
 		}
 		catch (Exception e)

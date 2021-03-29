@@ -1,6 +1,6 @@
 package com.whozoncall.Entities;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -19,12 +19,16 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import com.whozoncall.Constants.IntegrationTypes;
 
 @Entity
 @Table(name="integration")
 public class Integration{
 
+	
   @Id
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Long id;
@@ -47,6 +51,8 @@ public class Integration{
   
   //e.g. to channel #UKJ64776 on slack
   private String toTypeId;
+  
+  private String toTypeName; //#devops channel
   
   
   // picked from slack User tz
@@ -112,19 +118,29 @@ public void setToType(IntegrationTypes toType) {
 		return createdOn;
 	}
 	
-	@PrePersist
+	
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
+	}
+	
+	@PrePersist
+	public void setCreatedOnDefault() {
+		this.createdOn = new Date();
 	}
 	
 	public Date getModifiedOn() {
 		return modifiedOn;
 	}
 	
-	@PrePersist
-	@PreUpdate
+	
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;
+	}
+	
+	@PreUpdate
+	public void setModifiedOnDefault()
+	{
+		this.modifiedOn = new Date();
 	}
 
 	public Boolean getActive() {
@@ -175,6 +191,15 @@ public void setToType(IntegrationTypes toType) {
 	public void setTopicString_250_chars(String topicString_250_chars) {
 		this.topicString_250_chars = topicString_250_chars;
 	}
+
+	public String getToTypeName() {
+		return toTypeName;
+	}
+
+	public void setToTypeName(String toTypeName) {
+		this.toTypeName = toTypeName;
+	}
+	
 	
 	  
 }

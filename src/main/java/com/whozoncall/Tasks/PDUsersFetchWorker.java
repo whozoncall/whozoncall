@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonObjectSerializer;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -28,10 +29,12 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.whozoncall.Constants.APIEndPoints;
 import com.whozoncall.Constants.IntegrationTypes;
 import com.whozoncall.Dao.PDAccountRepository;
+import com.whozoncall.Dao.SlackMemberRepository;
 import com.whozoncall.Entities.IntegrationUser;
 import com.whozoncall.Entities.OnCall;
 import com.whozoncall.Entities.PDAccount;
 import com.whozoncall.Entities.PDAuthEntity;
+import com.whozoncall.Entities.SlackChannelMember;
 
 /*
  * This a misnomer, i'm only fetching schedules for customers to be able to 1st select it and 
@@ -51,6 +54,11 @@ public class PDUsersFetchWorker {
 	@Autowired
 	private PDAccountRepository pDAccountRepo;
 	
+	@Autowired
+	private SlackMemberRepository slackMemberRepo;
+	
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
 	
 	void populateUsers(PDAccount acc, CloseableHttpClient client){
 		
@@ -65,6 +73,7 @@ public class PDUsersFetchWorker {
 		   Boolean hasMore = false;
 		   Integer offSet = 0;
 		   ArrayList<IntegrationUser> users = new ArrayList<>();
+		   SlackChannelMember member  = null;
 		   
 		   do{
 		   
@@ -89,13 +98,35 @@ public class PDUsersFetchWorker {
 					   		}
 					   			for(int j=0;j<usersArr.length();j++)
 					   		{
-					   				users.add(
-					   						new IntegrationUser(
-					   							usersArr.getJSONObject(j).getString("id"), 
-					   							usersArr.getJSONObject(j).getString("name"),
-						   						IntegrationTypes.PAGERDUTY,
-						   						usersArr.getJSONObject(j).getString("email")) // used to map folks magaaa, bekee beku
-					   						);
+					   				Optional<SlackChannelMember> hasUser = slackMemberRepo
+					   						.findByEmail(usersArr.getJSONObject(j).getString("email"));
+					   				
+					   				if(hasUser.isPresent())
+					   				{
+					   					member = hasUser.get();
+					   					users.add(
+						   						new IntegrationUser(
+						   							usersArr.getJSONObject(j).getString("id"), 
+						   							usersArr.getJSONObject(j).getString("name"),
+							   						IntegrationTypes.PAGERDUTY,
+							   						usersArr.getJSONObject(j).getString("email"),
+							   						acc,
+							   						member) // used to map folks magaaa, bekee beku
+						   						);
+					   					redisTemplate.opsForValue().setIfAbsent(usersArr.getJSONObject(j).getString("id")
+					   							, member.getUser_id());
+					   				}
+					   				else
+					   				{
+					   					users.add(
+						   						new IntegrationUser(
+						   							usersArr.getJSONObject(j).getString("id"), 
+						   							usersArr.getJSONObject(j).getString("name"),
+							   						IntegrationTypes.PAGERDUTY,
+							   						usersArr.getJSONObject(j).getString("email"),
+							   						acc) // used to map folks magaaa, bekee beku
+						   						);
+					   				}
 					   		}
 					   		
 					   }

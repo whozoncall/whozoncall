@@ -1,6 +1,6 @@
 package com.whozoncall.Entities;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.springframework.lang.Nullable;
@@ -57,6 +59,12 @@ public class IntegrationUser{
   private PDAccount pdaccount;
   
   
+
+ @ManyToOne(fetch = FetchType.LAZY)
+ @JoinColumn(name = "slack_member_id",nullable = true)
+ private SlackChannelMember slackUser;
+  
+  
   // this is slack or PagerDuty or  MS Teams specific user ID
   @Column(name="channel_user_id")
   private String channelUserId;
@@ -71,15 +79,32 @@ public class IntegrationUser{
 public IntegrationUser(){}
 
 //constructor
-public IntegrationUser(String channelUserId, String name, IntegrationTypes type, String email)
+public IntegrationUser(String channelUserId, String name, IntegrationTypes type, String email, PDAccount acc)
 {
-	  this.channelUserId = channelUserId; // e.g. PD  ಅಲ್ಲಿ ಮಗಾ
+	  this.channelUserId = channelUserId; // e.g. ಮಗಾ
 	  
 	  this.username = name;
 	  
 	  this.type = type;
 	  
 	  this.email = email;
+	  
+	  this.pdaccount = acc;
+}
+
+public IntegrationUser(String channelUserId, String name, IntegrationTypes type, String email, PDAccount acc,
+		SlackChannelMember slackChannelMember) {
+	this.channelUserId = channelUserId; // e.g. ಮಗಾ
+	  
+	  this.username = name;
+	  
+	  this.type = type;
+	  
+	  this.email = email;
+	  
+	  this.pdaccount = acc;
+	  
+	  this.slackUser = slackChannelMember;
 }
 
 public Long getId() {
@@ -102,8 +127,14 @@ public Date getCreatedOn() {
 	return createdOn;
 }
 
+
 public void setCreatedOn(Date createdOn) {
 	this.createdOn = createdOn;
+}
+
+@PrePersist
+public void setCreatedOnDefault() {
+	this.createdOn = new Date();
 }
 
 public IntegrationTypes getType() {
@@ -138,6 +169,12 @@ public void setModifiedOn(Date modifiedOn) {
 	this.modifiedOn = modifiedOn;
 }
 
+@PreUpdate
+public void setModifiedOnDefault() {
+	this.modifiedOn = new Date();
+}
+
+
 public String getSlackUserTimeZone() {
 	return slackUserTimeZone;
 }
@@ -152,6 +189,22 @@ public String getUsername() {
 
 public void setUsername(String username) {
 	this.username = username;
+}
+
+public PDAccount getPdaccount() {
+	return pdaccount;
+}
+
+public void setPdaccount(PDAccount pdaccount) {
+	this.pdaccount = pdaccount;
+}
+
+public SlackChannelMember getSlackUser() {
+	return slackUser;
+}
+
+public void setSlackUser(SlackChannelMember slackUser) {
+	this.slackUser = slackUser;
 }
   
 

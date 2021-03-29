@@ -10,6 +10,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whozoncall.Constants.APIEndPoints;
+import com.whozoncall.Dao.IntegrationUserRepository;
 import com.whozoncall.Dao.PDAccountRepository;
 import com.whozoncall.Dao.SlackMemberRepository;
+import com.whozoncall.Entities.IntegrationUser;
 import com.whozoncall.Entities.SlackChannelAccount;
 import com.whozoncall.Entities.SlackChannelMember;
 
@@ -35,6 +38,12 @@ public class SlackUserFetchWorker {
 	
 	@Autowired
 	private PDAccountRepository pdAccountRepo;
+	
+	@Autowired
+	private IntegrationUserRepository integrationUserRepo; 
+	
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
 	
 	
 	@Async
@@ -65,6 +74,7 @@ public class SlackUserFetchWorker {
 		   
 		   ArrayList<SlackChannelMember> channelMembers = new ArrayList<>(); 
 		   SlackChannelMember tmp = null;
+		   IntegrationUser integrationUserTmp = null;
 		   
 		   for(int i=0;i<members.size();i++)
 		   {
@@ -77,6 +87,19 @@ public class SlackUserFetchWorker {
 			   tmp.setTz(user.get("user").get("tz").asText());
 			   tmp.setTz_label(user.get("user").get("tz_label").asText());
 			   tmp.setEmail(user.get("user").get("profile").get("email").asText());
+			   
+			   // populate this map of PDUserId->SlackUserId
+			   Optional<IntegrationUser> hasUser = integrationUserRepo.findByEmail(tmp.getEmail());
+			   
+			   if(hasUser.isPresent())
+			   {
+				   integrationUserTmp = hasUser.get();
+				   integrationUserTmp.setSlackUser(tmp);
+				   integrationUserRepo.save(integrationUserTmp);
+				   redisTemplate.opsForValue().setIfAbsent(integrationUserTmp.getChannelUserId(), tmp.getUser_id());
+				   redisTemplate.opsForValue().setIfAbsent(tmp.getUser_id(),String.valueOf(tmp.getName().length()));
+			   }
+			   
 			   channelMembers.add(tmp);
 			   
 		   }

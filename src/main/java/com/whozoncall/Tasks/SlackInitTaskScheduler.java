@@ -49,7 +49,7 @@ import io.netty.handler.codec.http.HttpHeaders;
  * e.g. 1609765166000 is Mon Jan 04 2021 18:29:26
  * also 1609765169000 is Mon Jan 04 2021 18:29:29
  * 
- * But both will be scheduled at Jan 04 2021 18:29th Minute, maybe map key 040120211829
+ * But both will be scheduled at Jan 04 2021 18:29th Minute, maybe map key 04011229 (MMddHHmm)
  * 
  * 
  */
@@ -59,8 +59,6 @@ public class SlackInitTaskScheduler {
 	
 	
 	Logger logger = LoggerFactory.getLogger(SlackInitTaskScheduler.class);
-	
-	private Long miliSecondsToNextRun = 0L;
 	
 	private ExecutorService integrationProcessor;
 	
@@ -86,56 +84,13 @@ public class SlackInitTaskScheduler {
             .withZone(ZoneId.from(ZoneOffset.UTC));
 	
 
-	public void init() {
-		
-		
-		
-		integrationProcessor = Executors.newCachedThreadPool();
-		
-		results = new ArrayList<TaskResult>();
-		
-		/*
-		 * 
-		 * I'm picking all slackAccounts and making a easily accessible map
-		 * 		of accountId -> ChannelId -> Code 
-		 * 			|
-		 * 			'->	SlackUserId -> TimeZone
-		 */
-		
-		List<SlackChannelAccount> slackChannelAccounts = slackAccountRepo.findAllSlackChannelAccounts();
-		
-		
-		slackAccountChannelCodeMap = new HashMap<>();
-		
-		HashMap<String,String> tmpMap = new HashMap<>();
-		/*
-		for(SlackChannelAccount acc : slackChannelAccounts)
-		{
-			if( slackAccountChannelCodeMap.containsKey(acc.getLocalAccountId().toString()) )
-			{
-				tmpMap = slackAccountChannelCodeMap.get(acc.getLocalAccountId().toString());
-				tmpMap.put(acc.getChannelId(),acc.getCode());
-				slackAccountChannelCodeMap.put(acc.getLocalAccountId().toString(), tmpMap);
-				
-			}
-			else
-			{
-				tmpMap = new HashMap<>();
-				tmpMap.put(acc.getChannelId(),acc.getCode());
-				slackAccountChannelCodeMap.put(acc.getLocalAccountId().toString(), tmpMap);
-			}
-				
-		}
-		*/
-		
-		
-	}
+	
 	
 	private void startProcessForMinute(Integer timeInteger) throws IOException{
 		
 		
 		// fetch all Integrations for only timeInteger Minute
-		List<Integration> integrations = integrationRepo.findAllPaidIntegrationsToSlack(timeInteger);
+		List<Integration> integrations = integrationRepo.findAllPaidAndActiveTrialIntegrationsToSlackForNextInvocation(timeInteger);
 		client = AsyncHttpCallWrapper.getAsyncClientInstance();
 		
 		
@@ -211,8 +166,8 @@ public class SlackInitTaskScheduler {
 	}
 
 	// Let's run this every minute
-	//@Scheduled(cron="* * * * *")
-	//@Async
+	@Scheduled(cron="* * * * * *")
+	@Async
 	public void runEveryMin() throws Exception {
 		
 		this.startProcessForMinute(Integer.parseInt(formatter.format(Instant.now()).toString()));
