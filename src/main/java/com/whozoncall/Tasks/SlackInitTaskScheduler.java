@@ -74,32 +74,38 @@ public class SlackInitTaskScheduler {
 	@Autowired
 	private TaskRepository taskRepo;
 	
-	AsyncHttpClient client;
+	private AsyncHttpClient client;
 	
-	ArrayList<TaskResult> results;
+	private ArrayList<TaskResult> results = new ArrayList<TaskResult>();
 	
-	HashMap<String, HashMap<String,String>> slackAccountChannelCodeMap;
+	private HashMap<String, HashMap<String,String>> slackAccountChannelCodeMap;
 	
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddHHmm")
+	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddHHmm")
             .withZone(ZoneId.from(ZoneOffset.UTC));
 	
-
+	private List<Integration> integrations = new ArrayList<Integration>();
 	
 	
 	private void startProcessForMinute(Integer timeInteger) throws IOException{
 		
 		
+		try {
+			SlackChannelAccount channelAccount = null;
+			logger.error("Started for Minute ="+timeInteger);
+		
 		// fetch all Integrations for only timeInteger Minute
-		List<Integration> integrations = integrationRepo.findAllPaidAndActiveTrialIntegrationsToSlackForNextInvocation(timeInteger);
+		integrations = integrationRepo.findAllPaidAndActiveTrialIntegrationsToSlackForNextInvocation(timeInteger);
 		client = AsyncHttpCallWrapper.getAsyncClientInstance();
 		
 		
 		for(Integration integration : integrations)
 		{	
 		
+				channelAccount = slackAccountRepo.findByChannelId(integration.getToTypeId());
+			
 		client.preparePost(APIEndPoints.SLACK_API_CONVERSATION_TOPIC_SET_POST.value)
 			         .setHeader("Content-Type", "application/x-www-form-urlencoded")
-			         .setHeader("Authorization", "Bearer "+slackAccountChannelCodeMap.get(integration.getAccount().getId().toString()).get(integration.getToTypeId()))
+			         .setHeader("Authorization", "Bearer "+channelAccount.getSlackAuthEntity().getAccess_token())
 			         .setBody("channel="+integration.getToTypeId()+"&topic="+integration.getTopicString())
 			         .execute(new AsyncHandler<Integer>() {
 						private Integer status;
@@ -151,27 +157,37 @@ public class SlackInitTaskScheduler {
 			// updates next on call and the topic string as well
 			integration.updateIntegration();
 		}
+		
+		
+		}
+		catch(Exception e)
+		{
+			logger.error(" Slack post error -> ",e);
+		}
+		this.close();
+		logger.error("Ended for Minute ="+timeInteger);
 	}
 	
 	
 	
 	public void close() throws IOException {
 		
+		while(this.results.size()<this.integrations.size());
+			
+		
 		taskRepo.saveAll(results);
 		
 		client.close();
 		
-		integrationProcessor.shutdown();
-		
 	}
 
 	// Let's run this every minute
-	@Scheduled(cron="* * * * * *")
+	@Scheduled(cron="0 * * * * *")
 	@Async
 	public void runEveryMin() throws Exception {
 		
 		this.startProcessForMinute(Integer.parseInt(formatter.format(Instant.now()).toString()));
-			
+		
 	}
 	
 }

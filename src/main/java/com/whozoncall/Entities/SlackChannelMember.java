@@ -1,5 +1,6 @@
 package com.whozoncall.Entities;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -18,8 +19,8 @@ public class SlackChannelMember {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	
-	private String user_id; 
+	@Column(name = "user_id")
+	private String userId;
 
 	
 	private String tz;
@@ -56,13 +57,7 @@ public class SlackChannelMember {
 		this.email = email;
 	}
 
-	public String getUser_id() {
-		return user_id;
-	}
-
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
-	}
+	
 
 	public Long getId() {
 		return id;
@@ -78,6 +73,14 @@ public class SlackChannelMember {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
 	

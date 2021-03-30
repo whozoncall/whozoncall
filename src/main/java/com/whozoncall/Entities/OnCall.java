@@ -34,7 +34,7 @@ public class OnCall {
   // this could be one of this App's USP
   private String onCallScheduleNameAlias;
   
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "integration_id")
   @Nullable
   @JsonIgnore
@@ -49,7 +49,7 @@ public class OnCall {
   
   
   // only when type is PAGERDUTY, will add for subsequent types
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "pd_account_id",nullable = true)
   private PDAccount pdaccount;
   

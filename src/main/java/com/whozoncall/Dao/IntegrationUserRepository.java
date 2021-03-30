@@ -15,5 +15,7 @@ public interface IntegrationUserRepository extends CrudRepository<IntegrationUse
 
 	
 	Optional<IntegrationUser> findByEmail(String email);
+
+	Optional<IntegrationUser> findByChannelUserId(String channelUserId);
 	
 }

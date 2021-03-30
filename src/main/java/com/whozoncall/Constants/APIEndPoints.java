@@ -24,7 +24,7 @@ public enum APIEndPoints {
 	
 	PD_SCHEDULES_GET("https://api.pagerduty.com/schedules"),
 	
-	PD_ONCALLS_GET("https://api.pagerduty.com/oncalls&time_zone=UTC"), // by default requesting in UTC tz
+	PD_ONCALLS_GET("https://api.pagerduty.com/oncalls?time_zone=UTC"), // by default requesting in UTC tz
 	
 	PD_USERS_GET("https://api.pagerduty.com/users"),
 	
@@ -38,7 +38,9 @@ public enum APIEndPoints {
 	PD_API_AUTH_POST("https://app.pagerduty.com/oauth/token?grant_type=authorization_code&client_id="+APIEndPoints.PD_CLIENT_ID.value
 			+ "&client_secret="+APIEndPoints.PD_CLIENT_SECRET.value+"&redirect_uri="+PD_AUTH_REDIRECT_URI.value+"&code="),
 	
-	PD_API_CONTENT_TYPE("application/vnd.pagerduty+json;version=2");
+	PD_API_CONTENT_TYPE("application/vnd.pagerduty+json;version=2"), 
+	
+	DEFAULT_SLACK_MEMBER_NAME_LENGTH("20");
 	
 	public final String value;
 	

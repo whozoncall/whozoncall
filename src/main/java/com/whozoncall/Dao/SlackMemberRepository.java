@@ -13,5 +13,7 @@ public interface SlackMemberRepository extends CrudRepository<SlackChannelMember
 
 	Optional<SlackChannelMember> findByEmail(String string);
 
+	Optional<SlackChannelMember> findByUserId(String slackUserId);
+
 
 }

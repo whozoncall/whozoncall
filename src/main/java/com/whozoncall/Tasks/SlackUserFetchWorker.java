@@ -73,6 +73,7 @@ public class SlackUserFetchWorker {
 		   JsonNode members = membersObj.get("members");
 		   
 		   ArrayList<SlackChannelMember> channelMembers = new ArrayList<>(); 
+		   ArrayList<IntegrationUser> IntegrationUsers = new ArrayList<>(); 
 		   SlackChannelMember tmp = null;
 		   IntegrationUser integrationUserTmp = null;
 		   
@@ -87,7 +88,7 @@ public class SlackUserFetchWorker {
 			   tmp.setTz(user.get("user").get("tz").asText());
 			   tmp.setTz_label(user.get("user").get("tz_label").asText());
 			   tmp.setEmail(user.get("user").get("profile").get("email").asText());
-			   
+			   tmp.setName(user.get("user").get("name").asText());
 			   // populate this map of PDUserId->SlackUserId
 			   Optional<IntegrationUser> hasUser = integrationUserRepo.findByEmail(tmp.getEmail());
 			   
@@ -95,7 +96,7 @@ public class SlackUserFetchWorker {
 			   {
 				   integrationUserTmp = hasUser.get();
 				   integrationUserTmp.setSlackUser(tmp);
-				   integrationUserRepo.save(integrationUserTmp);
+				   IntegrationUsers.add(integrationUserTmp);
 				   redisTemplate.opsForValue().setIfAbsent(integrationUserTmp.getChannelUserId(), tmp.getUser_id());
 				   redisTemplate.opsForValue().setIfAbsent(tmp.getUser_id(),String.valueOf(tmp.getName().length()));
 			   }
@@ -106,6 +107,7 @@ public class SlackUserFetchWorker {
  		   
 		   
 		   slackMemberRepo.saveAll(channelMembers);
+		   integrationUserRepo.saveAll(IntegrationUsers);
 		   
 		   client.close();
 			   
