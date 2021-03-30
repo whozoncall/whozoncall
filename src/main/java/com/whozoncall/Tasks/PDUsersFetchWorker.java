@@ -114,7 +114,7 @@ public class PDUsersFetchWorker {
 							   						member) // used to map folks magaaa, bekee beku
 						   						);
 					   					redisTemplate.opsForValue().setIfAbsent(usersArr.getJSONObject(j).getString("id")
-					   							, member.getUser_id());
+					   							, member.getUserId());
 					   				}
 					   				else
 					   				{

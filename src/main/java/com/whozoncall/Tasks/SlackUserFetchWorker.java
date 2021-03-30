@@ -84,7 +84,7 @@ public class SlackUserFetchWorker {
 			   
 			   tmp = new SlackChannelMember();
 			   
-			   tmp.setUser_id(members.get(i).asText());
+			   tmp.setUserId(members.get(i).asText());
 			   tmp.setTz(user.get("user").get("tz").asText());
 			   tmp.setTz_label(user.get("user").get("tz_label").asText());
 			   tmp.setEmail(user.get("user").get("profile").get("email").asText());
@@ -97,8 +97,8 @@ public class SlackUserFetchWorker {
 				   integrationUserTmp = hasUser.get();
 				   integrationUserTmp.setSlackUser(tmp);
 				   IntegrationUsers.add(integrationUserTmp);
-				   redisTemplate.opsForValue().setIfAbsent(integrationUserTmp.getChannelUserId(), tmp.getUser_id());
-				   redisTemplate.opsForValue().setIfAbsent(tmp.getUser_id(),String.valueOf(tmp.getName().length()));
+				   redisTemplate.opsForValue().setIfAbsent(integrationUserTmp.getChannelUserId(), tmp.getUserId());
+				   redisTemplate.opsForValue().setIfAbsent(tmp.getUserId(),String.valueOf(tmp.getName().length()));
 			   }
 			   
 			   channelMembers.add(tmp);
