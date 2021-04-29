@@ -87,7 +87,13 @@ public class SlackUserFetchWorker {
 			   tmp.setUserId(members.get(i).asText());
 			   tmp.setTz(user.get("user").get("tz").asText());
 			   tmp.setTz_label(user.get("user").get("tz_label").asText());
-			   tmp.setEmail(user.get("user").get("profile").get("email").asText());
+			   
+			   if(user.get("user").has("profile") && user.get("user").get("profile").has("email"))
+				   tmp.setEmail(user.get("user").get("profile").get("email").asText());
+			   else
+			   {
+				   logger.error("No profile json ->"+user.get("user").toString());
+			   }
 			   tmp.setName(user.get("user").get("name").asText());
 			   // populate this map of PDUserId->SlackUserId
 			   Optional<IntegrationUser> hasUser = integrationUserRepo.findByEmail(tmp.getEmail());
@@ -97,8 +103,8 @@ public class SlackUserFetchWorker {
 				   integrationUserTmp = hasUser.get();
 				   integrationUserTmp.setSlackUser(tmp);
 				   IntegrationUsers.add(integrationUserTmp);
-				   redisTemplate.opsForValue().setIfAbsent(integrationUserTmp.getChannelUserId(), tmp.getUserId());
-				   redisTemplate.opsForValue().setIfAbsent(tmp.getUserId(),String.valueOf(tmp.getName().length()));
+				   redisTemplate.opsForHash().putIfAbsent("user",integrationUserTmp.getChannelUserId(), tmp.getUserId());
+				   redisTemplate.opsForHash().putIfAbsent("user",tmp.getUserId(),String.valueOf(tmp.getName().length()));
 			   }
 			   
 			   channelMembers.add(tmp);

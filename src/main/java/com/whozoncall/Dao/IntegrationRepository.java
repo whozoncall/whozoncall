@@ -17,4 +17,6 @@ public interface IntegrationRepository extends CrudRepository<Integration, Long>
 	@Query("from Integration i where i.toType='SLACK' and i.account.id=?1 ")
 	List<Integration> findAllIntegrationsByAccountId(Long accountId);
 
+	Iterable<Integration> findByActiveTrue();
+
 }

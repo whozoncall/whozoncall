@@ -1,8 +1,11 @@
 package com.whozoncall.Entities;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,6 +16,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.springframework.lang.Nullable;
@@ -34,7 +39,7 @@ public class OnCall {
   // this could be one of this App's USP
   private String onCallScheduleNameAlias;
   
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
   @JoinColumn(name = "integration_id")
   @Nullable
   @JsonIgnore
@@ -56,6 +61,8 @@ public class OnCall {
   
   private  String curOnCallStartTime;
   
+  
+  
   private IntegrationTypes type;
   
   // Current User's End time is as same as 
@@ -66,8 +73,27 @@ public class OnCall {
   
   
   
-  // this will help in scheduling next topic post
-  private  long nextOnCallStartTimeEpoc;
+  
+  private  long currentOnCallStartTimeEpoc = 0;
+  
+  private Long createdOn;
+  
+  private Long modifiedOn;
+  
+  
+  @PrePersist
+	void updateModifiedOnAndCreatedOn()
+	{
+		this.modifiedOn = this.createdOn =  Instant.now().getEpochSecond();
+	}
+
+	
+	
+	@PreUpdate
+	void updateModifiedOn()
+	{
+		this.modifiedOn = Instant.now().getEpochSecond();
+	}
 	
   public OnCall(){}
   
@@ -84,12 +110,12 @@ public class OnCall {
   }
   
   
-		public long getNextOnCallStartTimeEpoc() {
-		return nextOnCallStartTimeEpoc;
+		public long getCurrentOnCallStartTimeEpoc() {
+		return currentOnCallStartTimeEpoc;
 	}
 	
-	public void setNextOnCallStartTimeEpoc(long nextOnCallStartTimeEpoc) {
-		this.nextOnCallStartTimeEpoc = nextOnCallStartTimeEpoc;
+	public void setCurrentOnCallStartTimeEpoc(long currentOnCallStartTimeEpoc) {
+		this.currentOnCallStartTimeEpoc = currentOnCallStartTimeEpoc;
 	}
 	
 	public String getScheduleId() {
@@ -138,6 +164,7 @@ public class OnCall {
 
 	public void setCurOnCallStartTime(String curOnCallStartTime) {
 		this.curOnCallStartTime = curOnCallStartTime;
+		this.currentOnCallStartTimeEpoc = Instant.parse(curOnCallStartTime).getEpochSecond();
 	}
 
 	public String getOnCallScheduleName() {
@@ -173,7 +200,7 @@ public class OnCall {
 	}
 
 	public List<Integration> getIntegration() {
-		return integration;
+		return this.integration;
 	}
 
 	public void setIntegration(List<Integration> integration) {

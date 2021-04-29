@@ -43,7 +43,7 @@ public class Integration{
   private Date createdOn;
   
   //e.g. this is a list can have Schedules of PD and/ or OnCalls of Opsgenie can be clubbed.
-  @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy="integration")
+  @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL, mappedBy="integration")
   private List<OnCall> onCall;
   
   

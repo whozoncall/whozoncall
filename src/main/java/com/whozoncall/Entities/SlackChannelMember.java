@@ -19,7 +19,7 @@ public class SlackChannelMember {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name = "user_id")
+	@Column(name = "user_id",unique=true)
 	private String userId;
 
 	

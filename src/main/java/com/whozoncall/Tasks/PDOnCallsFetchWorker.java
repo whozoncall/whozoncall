@@ -50,11 +50,24 @@ public class PDOnCallsFetchWorker {
 	@Autowired
 	private PDAccountRepository pDAccountRepo;
 	
+	private Set<String> fetchedOncallIds = null;
+	
+	private List<OnCall> fetchedOncalls = null;
 	
 	void populateSchedules(PDAccount acc, CloseableHttpClient client){
 		
 		
-		ObjectMapper mapper = new ObjectMapper();
+		   fetchedOncalls = acc.getOnCalls();
+		   
+		   if(fetchedOncalls != null && fetchedOncalls.size()>0)
+		   {
+			   for(OnCall oncall : fetchedOncalls)
+			   {
+				   fetchedOncallIds.add(oncall.getScheduleId());
+			   }
+		   }
+			
+		
 		   HttpGet request = new HttpGet(APIEndPoints.PD_SCHEDULES_GET.value);
 
 		   request.setHeader("Accept", APIEndPoints.PD_API_CONTENT_TYPE.value);
@@ -89,13 +102,16 @@ public class PDOnCallsFetchWorker {
 					   		}
 					   			for(int j=0;j<schedules.length();j++)
 					   		{
-					   				onCalls.add(
+					   				
+					   				if(!fetchedOncallIds.contains(schedules.getJSONObject(j).getString("id")))
+					   				    onCalls.add(
 					   						new OnCall(
 						   						schedules.getJSONObject(j).getString("id"),  // scheduleId
 						   						schedules.getJSONObject(j).getString("name"),// scheduleName
 						   						IntegrationTypes.PAGERDUTY,
 						   						acc)
 					   						);
+					   				// we are not bothered with Schedule name changes! Should we be ?
 					   		}
 					   		
 					   }

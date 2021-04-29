@@ -3,6 +3,7 @@ package com.whozoncall.Tasks;
 import static org.asynchttpclient.Dsl.asyncHttpClient;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -12,11 +13,14 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.HttpResponseBodyPart;
 import org.asynchttpclient.HttpResponseStatus;
 import org.asynchttpclient.ListenableFuture;
+import org.asynchttpclient.Response;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,13 +64,8 @@ public class SlackInitTaskScheduler {
 	
 	Logger logger = LoggerFactory.getLogger(SlackInitTaskScheduler.class);
 	
-	private ExecutorService integrationProcessor;
-	
 	@Autowired
 	private SlackAccountRepository slackAccountRepo;
-	
-	@Autowired
-	private AccountRepository accountRepo;
 	
 	@Autowired
 	private IntegrationRepository integrationRepo;
@@ -74,120 +73,131 @@ public class SlackInitTaskScheduler {
 	@Autowired
 	private TaskRepository taskRepo;
 	
-	private AsyncHttpClient client;
+	@Autowired
+	private IntegrationUpdateWorker integrationUpdateWorker;
 	
-	private ArrayList<TaskResult> results = new ArrayList<TaskResult>();
+	private AsyncHttpClient client = AsyncHttpCallWrapper.getAsyncClientInstance();
 	
-	private HashMap<String, HashMap<String,String>> slackAccountChannelCodeMap;
+	private ArrayList<TaskResult> results = null;
+	
 	
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddHHmm")
             .withZone(ZoneId.from(ZoneOffset.UTC));
 	
-	private List<Integration> integrations = new ArrayList<Integration>();
+	private List<Integration> integrations = null;
 	
+	private Integer size = 0;
+	
+	private Integer thisMin = null;
+	
+	private JSONObject resultObj = null;
 	
 	private void startProcessForMinute(Integer timeInteger) throws IOException{
-		
+			
+		results = new ArrayList<TaskResult>();
+		integrations = new ArrayList<Integration>();
+		size=0;
 		
 		try {
 			SlackChannelAccount channelAccount = null;
-			logger.error("Started for Minute ="+timeInteger);
-		
-		// fetch all Integrations for only timeInteger Minute
-		integrations = integrationRepo.findAllPaidAndActiveTrialIntegrationsToSlackForNextInvocation(timeInteger);
-		client = AsyncHttpCallWrapper.getAsyncClientInstance();
-		
-		
-		for(Integration integration : integrations)
-		{	
-		
-				channelAccount = slackAccountRepo.findByChannelId(integration.getToTypeId());
 			
-		client.preparePost(APIEndPoints.SLACK_API_CONVERSATION_TOPIC_SET_POST.value)
-			         .setHeader("Content-Type", "application/x-www-form-urlencoded")
-			         .setHeader("Authorization", "Bearer "+channelAccount.getSlackAuthEntity().getAccess_token())
-			         .setBody("channel="+integration.getToTypeId()+"&topic="+integration.getTopicString())
-			         .execute(new AsyncHandler<Integer>() {
-						private Integer status;
-						@Override
-						public State onStatusReceived(HttpResponseStatus responseStatus) throws Exception {
-							status = responseStatus.getStatusCode();
-							
-							TaskResult res = new TaskResult();
-							res.setIntegrationId(integration.getId());
-							res.setNumberOfTries(1);
-							res.setTimeOfRequest(Instant.now().toEpochMilli());
-							res.setResultStatusCode(status);
-							results.add(res);
-							return State.ABORT;
-						}
-						
-						@Override
-						public void onThrowable(Throwable t) {
-							
-							TaskResult res = new TaskResult();
-							res.setIntegrationId(integration.getId());
-							res.setNumberOfTries(1);
-							res.setTimeOfRequest(Instant.now().toEpochMilli());
-							res.setResultStatusCode(status);
-							res.setErrorString(t.getMessage());
-							results.add(res);
-						}
-
-						@Override
-						public State onHeadersReceived(HttpHeaders headers) throws Exception {
-							return State.ABORT;
-						}
-
-						@Override
-						public State onBodyPartReceived(HttpResponseBodyPart bodyPart) throws Exception {
-							return State.ABORT;
-						}
-
-						@Override
-						public Integer onCompleted() throws Exception {
-							return 0;
-						}
-					});
 		
-		}
-		
-		for(Integration integration : integrations)
-		{
-			// updates next on call and the topic string as well
-			integration.updateIntegration();
-		}
-		
+			// fetch all Integrations for only timeInteger Minute
+			integrations = integrationRepo.findAllPaidAndActiveTrialIntegrationsToSlackForNextInvocation(timeInteger);
+			size = integrations.size();
+			
+			for(Integration integration : integrations)
+			{	
+			
+				channelAccount = slackAccountRepo.findByChannelId(integration.getToTypeId());
+				
+				client.preparePost(APIEndPoints.SLACK_API_CONVERSATION_TOPIC_SET_POST.value)
+				         .setHeader("Content-Type", "application/x-www-form-urlencoded")
+				         .setHeader("Authorization", "Bearer "+channelAccount.getSlackAuthEntity().getAccess_token())
+				         .setBody("channel="+integration.getToTypeId()+"&topic="+integration.getTopicString_250_chars())
+				         .execute(new AsyncCompletionHandler<Object>() {
+				        	    @Override
+				        	    public Object onCompleted(Response response) throws Exception {
+				        	    	
+				        	    	
+				        	    	TaskResult res = new TaskResult();
+									res.setIntegrationId(integration.getId());
+									res.setNumberOfTries(0);
+									res.setTimeOfRequest(Instant.now().toEpochMilli());
+									res.setResultStatusCode(response.getStatusCode());
+									resultObj = new JSONObject(response.getResponseBody());
+									
+									if(resultObj.has("ok") && resultObj.getBoolean("ok"))
+										res.setErrorString(" Published ");
+									else
+										if(resultObj.has("ok"))
+											res.setErrorString(resultObj.getString("error"));
+										else
+											res.setErrorString(" something went very wrong!");
+									
+									results.add(res);
+									
+									if(results.size()==size)
+										close();
+										
+									return response;
+				        	    }
+				        	});
+			
+			}
+			
 		
 		}
 		catch(Exception e)
 		{
 			logger.error(" Slack post error -> ",e);
 		}
-		this.close();
-		logger.error("Ended for Minute ="+timeInteger);
+		
 	}
 	
 	
 	
 	public void close() throws IOException {
 		
-		while(this.results.size()<this.integrations.size());
+		try {
+			taskRepo.saveAll(results);
 			
-		
-		taskRepo.saveAll(results);
-		
-		client.close();
+			// reset counter for next minute
+			size=0;
+			
+			// update integrations for next update
+			integrationUpdateWorker.update(this.integrations);
+			
+			
+		}
+		catch(Exception e)
+		{
+			logger.error(" TaskResult Save error -> ",e);
+		}
+			
 		
 	}
 
-	// Let's run this every minute
+	/*
+	 *  Let's run this every minute
+	 *   Initial delay set to 1 minute to update all onCalls that maybe out of sync from current time
+	*/
 	@Scheduled(cron="0 * * * * *")
 	@Async
 	public void runEveryMin() throws Exception {
 		
-		this.startProcessForMinute(Integer.parseInt(formatter.format(Instant.now()).toString()));
-		
+		try {
+			thisMin = Integer.parseInt(formatter.format(Instant.now()).toString());
+			logger.error("Started for Minute ="+thisMin);
+			
+			this.startProcessForMinute(thisMin);
+			
+			logger.error("Ended for Minute ="+thisMin);
+		}
+		catch(Exception e)
+		{
+			logger.error(" Slack "+thisMin==null ? " - ": thisMin +" Minute Job error -> ",e);
+		}
 	}
 	
 }
