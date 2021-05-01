@@ -31,7 +31,10 @@ public class CustomFilter implements Filter {
 	    		HttpServletResponse res =(HttpServletResponse)response;
 	    		
     	//CASE 1 allow calls to Login and register UI and backend calls
-    	if(req.getServletPath().endsWith("/login") || req.getServletPath().endsWith("/Login") || req.getServletPath().endsWith("/Register")
+    	if(req.getServletPath().equals("/") || req.getServletPath().endsWith(".min.js") || 
+    			req.getServletPath().endsWith(".svg") || req.getServletPath().endsWith(".png") ||
+    			req.getServletPath().endsWith(".min.css") ||req.getServletPath().endsWith("/login") ||
+    			req.getServletPath().endsWith("/Login") || req.getServletPath().endsWith("/Register")
     			|| req.getServletPath().endsWith("/register") || 
     			req.getServletPath().endsWith("/handleAuthCode"))
     		chain.doFilter(request, response);
@@ -51,7 +54,8 @@ public class CustomFilter implements Filter {
 	    //CASE 2.2 UI call without session = DENY	     
 	    			else
 	    				res.sendRedirect("/ui/login");
-    		}	
+    		}
+    	
     	//CASE 3 any NON UI call with session 
     	else if( req.getSession(false)!=null)
     			chain.doFilter(request, response);

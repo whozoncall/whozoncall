@@ -2,6 +2,7 @@ package com.whozoncall.Entities;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -213,6 +214,17 @@ public class OnCall {
 
 	public void setPdaccount(PDAccount pdaccount) {
 		this.pdaccount = pdaccount;
+	}
+
+
+
+	public HashSet<Long> getIntegrationIdsSet() {
+		
+		HashSet<Long> set = new HashSet<Long>();
+		for( Integration i : this.integration)
+			set.add(i.getId());
+			
+		return set;
 	}
 	  
 	  

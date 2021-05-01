@@ -65,6 +65,7 @@ public class AuthHandler {
 					session.setAttribute("userId", user.getId());
 					session.setAttribute("accountId", acc.getId());
 					session.setAttribute("accountGuid", acc.getGuid());
+					session.setAttribute("sideNav", false);
 					return  ResponseEntity.ok().build();
 				}
 				else
@@ -102,13 +103,14 @@ public class AuthHandler {
 			user.setPassword(Base64.getEncoder().encodeToString(hash(account.getPassword(),SecurityConstants.SALT.value.getBytes())));
 			user.setEmail(account.getEmail());
 			
-			accountRepo.save(localAccount);
+			accountRepo.save(localAccount);	
 			user.setAccount(localAccount);
 			userRepo.save(user);
 			
 			session.setAttribute("accountId", localAccount.getId());
 			session.setAttribute("accountGuid", localAccount.getGuid());
 			session.setAttribute("userId", user.getId());
+			session.setAttribute("sideNav", false);
 		}
 		catch (Exception e)
 		{
