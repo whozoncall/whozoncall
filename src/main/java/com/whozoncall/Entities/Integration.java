@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -62,6 +63,8 @@ public class Integration{
   *  (in case next on call is < 5 minutes away from now, do it now)
   *  also limited to 250 chars for SLACK
   */
+  
+  @Column(name = "topic_string", columnDefinition = "Text")
   private String topicString;
   
   private String topicString_250_chars;

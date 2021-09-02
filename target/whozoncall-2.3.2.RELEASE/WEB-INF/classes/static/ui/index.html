@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Whozoncall</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="ui/assets/images/logo.png" /> 
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+
+
+
+<style type="text/css">
+.bg-1 { 
+    background-color: #1abc9c; /* Green */
+    color: #ffffff;
+  }
+  
+html, body {
+    min-height: 100%;
+}
+
+	body {
+  background-color:#00607e;
+  text-align: center;
+  color:#fff;
+}
+
+.typewriter{
+	color:#ffe664;
+	font-family: Plain,"Helvetica Neue",Helvetica,Franklin Gothic Medium,Franklin Gothic,ITC Franklin Gothic,sans-serif;
+    font-weight: 300;
+}
+
+span.wrap
+{
+	font-weight: 400;	
+}
+
+.logoStyle{
+color: #00607e;
+    position: relative;
+    top: -122%;
+    left: -32%;
+    font-size: xx-large;
+}
+
+* { color:#fff; text-decoration: none;}
+
+.container-fluid
+{
+	padding-top: 20%;
+	padding-bottom: 20%;
+}
+
+.footer-container
+{
+	padding-top: 3%;
+	padding-bottom: 3%;
+}
+
+
+</style>
+
+
+<script type="text/javascript">
+	var TxtType = function(el, toRotate, period) {
+        this.toRotate = toRotate;
+        this.el = el;
+        this.loopNum = 0;
+        this.period = parseInt(period, 10) || 2000;
+        this.txt = '';
+        this.tick();
+        this.isDeleting = false;
+    };
+
+    TxtType.prototype.tick = function() {
+        var i = this.loopNum % this.toRotate.length;
+        var fullTxt = this.toRotate[i];
+
+        if (this.isDeleting) {
+        this.txt = fullTxt.substring(0, this.txt.length - 1);
+        } else {
+        this.txt = fullTxt.substring(0, this.txt.length + 1);
+        }
+
+        this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
+
+        var that = this;
+        var delta = 200 - Math.random() * 100;
+
+        if (this.isDeleting) { delta /= 2; }
+
+        if (!this.isDeleting && this.txt === fullTxt) {
+        delta = this.period;
+        this.isDeleting = true;
+        } else if (this.isDeleting && this.txt === '') {
+        this.isDeleting = false;
+        this.loopNum++;
+        delta = 500;
+        }
+
+        setTimeout(function() {
+        that.tick();
+        }, delta);
+    };
+
+    window.onload = function() {
+        var elements = document.getElementsByClassName('typewrite');
+        for (var i=0; i<elements.length; i++) {
+            var toRotate = elements[i].getAttribute('data-type');
+            var period = elements[i].getAttribute('data-period');
+            if (toRotate) {
+              new TxtType(elements[i], JSON.parse(toRotate), period);
+            }
+        }
+        // INJECT CSS
+        var css = document.createElement("style");
+        css.type = "text/css";
+        css.innerHTML = ".typewrite > .wrap { border-right: 0.08em solid #fff}";
+        document.body.appendChild(css);
+    };	
+</script>
+
+<body>
+
+<nav class="navbar navbar-default">
+
+
+  <div class="container">
+    <div class="navbar-header">
+      
+      <a class="navbar-brand" href="#"><img style="width:4.5%;" src="ui/assets/images/logo.png" /><span class="logoStyle">Whozoncall</span></a>
+    </div>
+  <div class="collapse navbar-collapse" id="myNavbar">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="/ui/login">Login</a></li>
+      <li><a href="/ui/register">Register</a></li>
+    </ul>
+  </div>  
+  </div>
+</nav>
+  
+<div class="container-fluid typewriter" >
+  <h1>Know who are <b>On Call</b> </h1>
+  
+  <h1>
+  <a href="" class="typewrite typewriter" data-period="500" data-type='[ "Without a Click.", "Without havin to Scroll.","Instantly!" ]'>
+    <span class="wrap typewriter"></span>	
+  </a>
+</h1>
+</div>
+
+<div class="container-fluid bg-1 text-center">
+
+<h1> Post PagerDuty On Call to Slack Channel </h1>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer-container bg-4 text-center" style="background-color:#ffffff;color:#00607e;">
+  <div class="container">
+    <div class="footer-col footer-col--extra mb2">
+      
+        <a style="float:left;" href="/terms/" class="color-grey">Terms</a> · <a style="float:left;margin-left:1%;" href="/privacy/" class="color-grey">Privacy</a>
+        <a style="float:right;" href="https://twitter.com/whozoncall" target="_blank" class="color-grey">@whozoncall</a><span style="float:right;color:#337ab7;"> © 2021–2022</span>
+      
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

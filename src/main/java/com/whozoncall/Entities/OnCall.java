@@ -75,7 +75,7 @@ public class OnCall {
   
   
   
-  private  long currentOnCallStartTimeEpoc = 0;
+  private  Long currentOnCallStartTimeEpoc = 0L;
   
   private Long createdOn;
   
@@ -85,7 +85,7 @@ public class OnCall {
   @PrePersist
 	void updateModifiedOnAndCreatedOn()
 	{
-		this.modifiedOn = this.createdOn =  Instant.now().getEpochSecond();
+		this.setModifiedOn(this.setCreatedOn(Instant.now().getEpochSecond()));
 	}
 
 	
@@ -93,7 +93,7 @@ public class OnCall {
 	@PreUpdate
 	void updateModifiedOn()
 	{
-		this.modifiedOn = Instant.now().getEpochSecond();
+		this.setModifiedOn(Instant.now().getEpochSecond());
 	}
 	
   public OnCall(){}
@@ -225,6 +225,31 @@ public class OnCall {
 			set.add(i.getId());
 			
 		return set;
+	}
+
+
+
+	public Long getCreatedOn() {
+		return createdOn;
+	}
+
+
+
+	public Long setCreatedOn(Long createdOn) {
+		this.createdOn = createdOn;
+		return createdOn;
+	}
+
+
+
+	public Long getModifiedOn() {
+		return modifiedOn;
+	}
+
+
+
+	public void setModifiedOn(Long modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 	  
 	  

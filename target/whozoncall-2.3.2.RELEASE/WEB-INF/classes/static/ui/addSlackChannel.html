@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Whozoncall</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="assets/vendors/css/select2.min.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="assets/images/logo.png" />   
+  </head>
+  <style>
+
+	.bigdrop {
+    width: 600px !important;
+    font-size:20px !important;
+}
+
+.select2-results .select2-highlighted {
+    background: #f00;
+    color: #fff;
+}
+
+</style>
+  <input id="sideNav"  th:value="${sideNav}"  type="hidden" />
+  <body class=""  th:classappend="${sideNav} ? sidebar-icon-only : xyz">
+    <div class="container-scroller">
+      <!-- partial:partials/_navbar.html -->
+      <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+          <a class="navbar-brand brand-logo"  href="integrations">
+            <img style="height: 150%; width: 70%;" src="assets/images/named_logo.png" alt="logo" />
+          </a>
+          <a class="navbar-brand brand-logo-mini" href="integrations"><img style="width:50%;" src="assets/images/logo.png" alt="logo" /></a>
+            
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-stretch">
+          <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <span class="mdi mdi-menu"></span>
+          </button>
+          
+          <ul class="navbar-nav navbar-nav-right">
+            <li class="nav-item nav-profile dropdown">
+              <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+                <div class="nav-profile-img">
+                  <img src="assets/images/faces/face1.jpg" alt="image">
+                  <span class="availability-status online"></span>
+                </div>
+                <div class="nav-profile-text">
+                  <p class="mb-1 text-black">David Greymaax</p>
+                </div>
+              </a>
+              <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
+                <a class="dropdown-item" href="#">
+                  <i class="mdi mdi-account mr-2 text-success"></i> Profile </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">
+                  <i class="mdi mdi-logout mr-2 text-primary"></i> Signout </a>
+              </div>
+            </li>
+            <li class="nav-item d-none d-lg-block full-screen-link">
+              <a class="nav-link">
+                <i class="mdi mdi-fullscreen" id="fullscreen-button"></i>
+              </a>
+            </li>
+            
+            
+            <li class="nav-item nav-logout d-none d-lg-block">
+              <a class="nav-link" href="#">
+                <i class="mdi mdi-power"></i>
+              </a>
+            </li>
+            <li class="nav-item nav-settings d-none d-lg-block">
+              <a class="nav-link" href="#">
+                <i class="mdi mdi-format-line-spacing"></i>
+              </a>
+            </li>
+          </ul>
+          <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+            <span class="mdi mdi-menu"></span>
+          </button>
+        </div>
+      </nav>
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+          <ul class="nav">
+            
+            <li class="nav-item">
+              <a class="nav-link" href="integrations">
+                <span class="menu-title"> Integrations </span>
+                <i class="mdi mdi-bullseye menu-icon"></i>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="add">
+                <span class="menu-title"> Add Integration </span>
+                <i class="mdi mdi-bullseye menu-icon"></i><sub><i style="font-size: 111%;" class="mdi mdi mdi-plus menu-icon"></i></sub>
+              </a>
+            </li>
+            
+            <li class="nav-item active">
+              <a class="nav-link" href="addSlackChannel">
+                <span class="menu-title"> Add Channel </span>
+                <i class="mdi mdi mdi-plus menu-icon"></i>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="addOnCall">
+                <span class="menu-title"> Add OnCall </span>
+                <i class="mdi mdi-phone menu-icon"></i>
+              </a>
+            </li>
+            
+            
+            
+            
+          </ul>
+        </nav>
+        <div class="content-wrapper">
+        <!-- partial -->
+         <div class="row">
+              
+                <!-- pushlish to slack, teams etc-->
+                <div class="col-lg-12 grid-margin">
+                <div class="card">
+                	
+                    <div class="card-body">
+                      <h4 class="card-title text-black"> Grant permissions to publish to any Channel on Slack </h4>
+
+                      <!-- Add Slack Btn-->
+                        <a href="https://slack.com/oauth/v2/authorize?client_id=1503467881526.1522850369521&scope=channels:manage,groups:write,im:write,mpim:write,channels:read,incoming-webhook,channels:history,users:read,users:read.email&redirect_uri=https://whozoncall.com/v1/slack/handleAuthCode&state="+[(${accountGuid})]
+                        ><img alt="Add Slack Channel" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
+                    </div>
+                    
+                    
+                  </div>
+                </div> 
+                
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12 grid-margin">
+                <div class="float-sm-right">  
+                  <button class="add btn btn-gradient-primary font-weight-bold todo-list-add-btn" id="addIntegration">Activate</button>
+                </div>  
+                </div>
+              </div>  
+            </div>
+          </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:partials/_footer.html -->
+          <footer class="footer">
+            <div class="container-fluid clearfix">
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © whozoncall.com 2021</span>
+            </div>
+          </footer>
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="assets/vendors/js/select2.min.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="assets/vendors/chart.js/Chart.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="assets/js/off-canvas.js"></script>
+    <script src="assets/js/hoverable-collapse.js"></script>
+    <script src="assets/js/misc.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/todolist.js"></script>
+    <script src="assets/js/addPage.js"></script>
+    <!-- End custom js for this page -->
+  </body>
+</html>

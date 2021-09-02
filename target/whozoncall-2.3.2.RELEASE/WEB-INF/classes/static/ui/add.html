@@ -33,7 +33,8 @@
 }
 
 </style>
-  <body>
+  <input id="sideNav"  th:value="${sideNav}"  type="hidden" />
+  <body class=""  th:classappend="${sideNav} ? sidebar-icon-only : xyz">
     <div class="container-scroller">
       <!-- partial:partials/_navbar.html -->
       <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -101,6 +102,27 @@
               <a class="nav-link" href="integrations">
                 <span class="menu-title"> Integrations </span>
                 <i class="mdi mdi-bullseye menu-icon"></i>
+              </a>
+            </li>
+            
+            <li class="nav-item active">
+              <a class="nav-link" href="add">
+                <span class="menu-title"> Add Integration </span>
+                <i class="mdi mdi-bullseye menu-icon"></i><sub><i style="font-size: 111%;" class="mdi mdi mdi-plus menu-icon"></i></sub>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="addSlackChannel">
+                <span class="menu-title"> Add Channel </span>
+                <i class="mdi mdi mdi-plus menu-icon"></i>
+              </a>
+            </li>
+            
+            <li class="nav-item ">
+              <a class="nav-link" href="addOnCall">
+                <span class="menu-title"> Add OnCall </span>
+                <i class="mdi mdi-phone menu-icon"></i>
               </a>
             </li>
             
